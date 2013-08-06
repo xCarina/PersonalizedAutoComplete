@@ -10,6 +10,7 @@
 + Evaluation.java => calculates precision and recall for a query, user and algorithm
 + Search.java => executes the different search algorithms
 
+
 ###setup
 + BuildIndex.java => builds the search index
 + Config.java => configures used variables such as path of files
@@ -17,11 +18,14 @@
 + CustomTokenAnalyser => Extrension of Analyser
 + PageRank => Calculates the Page Rank for the Graph DB
 
+
 ###start
 + startSearch => starts a search process for a given user, query and algorithm
 
+
 ###userProfile
 + UserProfile => extracts users from file and seperates data for learning and testing
+
 
 ##Doc: Config File:
 + DB_BATH => neo4j Database path
