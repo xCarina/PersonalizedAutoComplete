@@ -1,24 +1,89 @@
 package setup;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 public class PageRank {
 
-	private static final String DB_PATH = "/home/carina/Workspaces/myDatabase";
 	
 	public static void calculatePageRank(){
 		
-		EmbeddedGraphDatabase graphDB = new EmbeddedGraphDatabase( DB_PATH );
+		int numberOfIterations = config.get().NUMBER_OF_ITERATIONS;
+		double alpha = 0.85;
+		EmbeddedGraphDatabase graphDB = new EmbeddedGraphDatabase( config.get().DB_PATH );
 		HashMap<Long, Double> pageRank = new HashMap<Long, Double>();
 		for (Node n : graphDB.getAllNodes()) {
 			pageRank.put(n.getId(), 1.0);
 		}
-		HashMap<Long, Double> newPageRank = new HashMap<Long, Double>(pageRank);		
+		HashMap<Long, Double> newPageRank = new HashMap<Long, Double>(pageRank);
+		
+		/*-----------------------------------------------------------------------------------------
+		 * PAGE RANK ITERATION:
+		 -----------------------------------------------------------------------------------------*/
+		
+		for(int i= 0; i < numberOfIterations; i++){
+			
+			for(Entry<Long, Double> entry : pageRank.entrySet()){
+				Node node = graphDB.getNodeById(entry.getKey());
+				//count number of outgoing links
+				int outgoingLinks = 0;
+				for (Relationship rel: node.getRelationships(Direction.OUTGOING)){
+					outgoingLinks++;
+				}
+				//get current page rank value and split it over all outgoing links
+				Double currentPageRank = entry.getValue();
+				if(outgoingLinks != 0){
+					Double delta = alpha * currentPageRank / outgoingLinks;
+					//add additional page rank value delta in newPageRank
+					for(Relationship rel: node.getRelationships(Direction.OUTGOING)){
+						Long nodeID = rel.getEndNode().getId();
+						if(nodeID != null){
+							Double current = newPageRank.get(nodeID);
+							newPageRank.put(nodeID, current + delta);
+						}
+					}
+				}
+				
+			}
+			pageRank = newPageRank;
+		}
+		updatePageRankValues(pageRank);
+		
 	}
 	
+	private static void updatePageRankValues(HashMap<Long, Double> pageRank) {
+	
+		int count = 0;
+		EmbeddedGraphDatabase graphDB = new EmbeddedGraphDatabase( config.get().DB_PATH );
+		Transaction tx = graphDB.beginTx();
+		
+		try {
+			for(Entry<Long, Double> entry : pageRank.entrySet()){
+				Node node = graphDB.getNodeById(entry.getKey());
+				node.setProperty("pageRankValue", entry.getValue());
+				if(count++ > 50000){
+					tx.success();
+					tx.finish();
+					count = 0;
+					tx = graphDB.beginTx();
+				}
+			}
+		} catch (Exception e) {
+			tx.failure();
+		} finally{
+			tx.finish();
+		}
+		
+		graphDB.shutdown();
+		
+	}
+
 	public static void main(String[] args) {
 		
 		calculatePageRank();

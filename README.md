@@ -1,4 +1,6 @@
 PersonalizedSearch
 #########################
 
-a project on personalized auto complete...
+Needed:
++ neo4j jar files
++ config.txt (configure path in PersonalizedAutoComplete > setup > config.jar)

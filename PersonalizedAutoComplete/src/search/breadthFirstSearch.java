@@ -14,6 +14,8 @@ import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.index.lucene.QueryContext;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
+import setup.config;
+
 public class breadthFirstSearch {
 	
 	public HashMap<String, Integer> results;
@@ -22,7 +24,7 @@ public class breadthFirstSearch {
 		
 		results = new HashMap<String, Integer>();
 		
-		EmbeddedGraphDatabase graphDB = new EmbeddedGraphDatabase("/home/carina/Workspaces/Data/graphDatabase");
+		EmbeddedGraphDatabase graphDB = new EmbeddedGraphDatabase(config.get().DB_PATH);
 		
 		Sort s = new Sort();
 		s.setSort(new SortField("score", SortField.DOUBLE, true));

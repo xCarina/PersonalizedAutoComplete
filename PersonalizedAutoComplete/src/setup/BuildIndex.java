@@ -9,13 +9,13 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 public class BuildIndex {
 
-	private static final String DB_PATH = "/home/carina/Workspaces/myTestDatabase";
-	private static final String indexName = "wiki-nodes";
 	private static Index<Node> searchIndex;
 	
-	public Index<Node> buildSearchIndex(){
+	public static Index<Node> buildSearchIndex(){
 		
-		EmbeddedGraphDatabase graphDB = new EmbeddedGraphDatabase( DB_PATH );
+		String indexName = config.get().INDEX_NAME;
+		
+		EmbeddedGraphDatabase graphDB = new EmbeddedGraphDatabase( config.get().DB_PATH );
 		
 /*-----------------------------------------------------------------------------------------------
  * DELETE SEARCH INDEX IF IT ALREADY EXISTS:
@@ -70,6 +70,8 @@ public class BuildIndex {
 	}
 	
 	public static void main(String[] args) {
+		
+		buildSearchIndex();
 		
 	}
 

@@ -24,8 +24,6 @@ import org.neo4j.kernel.impl.util.FileUtils;
 
 public class CreateGraphDatabase {
 	
-	private static final String DB_PATH = "/home/carina/Workspaces/myDatabase";
-	
 	//create relationship type
 	private static enum RelTypes implements RelationshipType{  LINKS_TO }
 	
@@ -36,11 +34,13 @@ public class CreateGraphDatabase {
  *  CONFIGURATIONS FOR BATCHINSERTER
  *  ----------------------------------------------------------------------------------------------------*/	
 		
-		Map<String, String> config = new HashMap<String, String>();
-		config.put( "neostore.nodestore.db.mapped_memory", "90M" );
-		config.put( "neostore.relationshipstore.db.mapped_memory", "2G" );
-		config.put( "neostore.propertystore.db.mapped_memory", "50M" );
-		config.put( "neostore.propertystore.db.strings.mapped_memory", "500M" );
+		String DB_PATH = config.get().DB_PATH;
+		
+		Map<String, String> configuration = new HashMap<String, String>();
+		configuration.put( "neostore.nodestore.db.mapped_memory", "90M" );
+		configuration.put( "neostore.relationshipstore.db.mapped_memory", "2G" );
+		configuration.put( "neostore.propertystore.db.mapped_memory", "50M" );
+		configuration.put( "neostore.propertystore.db.strings.mapped_memory", "500M" );
 		
 /* -----------------------------------------------------------------------------------------------------
  *  CLEAR DATABASE
@@ -65,7 +65,7 @@ public class CreateGraphDatabase {
 		 
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new FileReader("/home/carina/Workspaces/Data/wiki-titles.tsv"));
+			reader = new BufferedReader(new FileReader(config.get().WIKI_TITLES));
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
@@ -73,7 +73,7 @@ public class CreateGraphDatabase {
 		int count = 0;
 		long time1 = System.currentTimeMillis();
 		
-		BatchInserter inserter = new BatchInserterImpl(DB_PATH, config);
+		BatchInserter inserter = new BatchInserterImpl(DB_PATH, configuration);
 		try {
 			System.out.println("Starts adding nodes...");
 			while((line=reader.readLine())!=null){
@@ -101,14 +101,14 @@ public class CreateGraphDatabase {
 				
 
 		try {
-			reader = new BufferedReader(new FileReader("/home/carina/Workspaces/Data/wiki-links.tsv"));
+			reader = new BufferedReader(new FileReader(config.get().WIKI_LINKS));
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}			
 		
 		
 		
-//		inserter = new BatchInserterImpl(DB_PATH, config);
+//		inserter = new BatchInserterImpl(DB_PATH, configuration);
 //		count = 0;
 //		time1 = System.currentTimeMillis();
 //		try {
@@ -152,7 +152,7 @@ public class CreateGraphDatabase {
 					node1.createRelationshipTo(node2, RelTypes.LINKS_TO);
 				}
 				 
-				 if((count++%100000)==99999) {
+				 if((count++%50000)==49999) {
 					System.out.println(count + " Relationships [" + (System.currentTimeMillis()-time1)/1000 + "sec]");
 					transaction.success();
 					transaction.finish();
