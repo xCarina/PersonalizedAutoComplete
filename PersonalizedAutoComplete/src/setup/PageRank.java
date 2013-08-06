@@ -11,12 +11,12 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 public class PageRank {
 
+	private static EmbeddedGraphDatabase graphDB = new EmbeddedGraphDatabase( Config.get().DB_PATH );
 	
 	public static void calculatePageRank(){
 		
-		int numberOfIterations = config.get().NUMBER_OF_ITERATIONS;
+		int numberOfIterations = Config.get().NUMBER_OF_ITERATIONS;
 		double alpha = 0.85;
-		EmbeddedGraphDatabase graphDB = new EmbeddedGraphDatabase( config.get().DB_PATH );
 		HashMap<Long, Double> pageRank = new HashMap<Long, Double>();
 		for (Node n : graphDB.getAllNodes()) {
 			pageRank.put(n.getId(), 1.0);
@@ -55,12 +55,12 @@ public class PageRank {
 		}
 		updatePageRankValues(pageRank);
 		
+		
 	}
 	
 	private static void updatePageRankValues(HashMap<Long, Double> pageRank) {
 	
 		int count = 0;
-		EmbeddedGraphDatabase graphDB = new EmbeddedGraphDatabase( config.get().DB_PATH );
 		Transaction tx = graphDB.beginTx();
 		
 		try {

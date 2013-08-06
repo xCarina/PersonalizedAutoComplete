@@ -13,9 +13,9 @@ public class BuildIndex {
 	
 	public static Index<Node> buildSearchIndex(){
 		
-		String indexName = config.get().INDEX_NAME;
+		String indexName = Config.get().INDEX_NAME;
 		
-		EmbeddedGraphDatabase graphDB = new EmbeddedGraphDatabase( config.get().DB_PATH );
+		EmbeddedGraphDatabase graphDB = new EmbeddedGraphDatabase( Config.get().DB_PATH );
 		
 /*-----------------------------------------------------------------------------------------------
  * DELETE SEARCH INDEX IF IT ALREADY EXISTS:
@@ -65,7 +65,7 @@ public class BuildIndex {
 			System.out.println("Finished building index");
 		}
 		
-		
+		graphDB.shutdown();
 		return searchIndex;
 	}
 	

@@ -11,6 +11,9 @@ public class UserProfile {
 	private static String[] edits_learning;
 	private static String[] edits_testing;
 	
+	public String getName(){
+		return userName;
+	}
 	public String[] getEdits_learning(){
 		return edits_learning;
 	}
@@ -27,7 +30,6 @@ public class UserProfile {
 		if(edits != 0){
 			// 20:80 split to use as test and learning data
 			numberOfTestData = 	(edits * 20) / 100;
-			numberOfLearningData = edits -numberOfTestData;
 		}
 		/* first 20% of all edits are being used as interests for the personalized search 
 		 * (edits are ordered by number of edits => first edits = most interested in 
@@ -36,9 +38,9 @@ public class UserProfile {
 			String id = getEditTitel(values[i+1]);
 			edits_learning[i] = id;
 		}
-		for(int i = numberOfTestData; i< numberOfLearningData; i++){
+		for(int i = numberOfTestData; i< edits; i++){
 			String id = getEditTitel(values[i+1]);
-			edits_testing[i] = id;
+			edits_testing[i-numberOfTestData] = id;
 		}
 	}
 	

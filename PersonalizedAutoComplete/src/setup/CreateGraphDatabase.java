@@ -34,7 +34,7 @@ public class CreateGraphDatabase {
  *  CONFIGURATIONS FOR BATCHINSERTER
  *  ----------------------------------------------------------------------------------------------------*/	
 		
-		String DB_PATH = config.get().DB_PATH;
+		String DB_PATH = Config.get().DB_PATH;
 		
 		Map<String, String> configuration = new HashMap<String, String>();
 		configuration.put( "neostore.nodestore.db.mapped_memory", "90M" );
@@ -65,7 +65,7 @@ public class CreateGraphDatabase {
 		 
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new FileReader(config.get().WIKI_TITLES));
+			reader = new BufferedReader(new FileReader(Config.get().WIKI_TITLES));
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
@@ -101,7 +101,7 @@ public class CreateGraphDatabase {
 				
 
 		try {
-			reader = new BufferedReader(new FileReader(config.get().WIKI_LINKS));
+			reader = new BufferedReader(new FileReader(Config.get().WIKI_LINKS));
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}			
@@ -152,7 +152,7 @@ public class CreateGraphDatabase {
 					node1.createRelationshipTo(node2, RelTypes.LINKS_TO);
 				}
 				 
-				 if((count++%50000)==49999) {
+				 if((count++%500000)==499999) {
 					System.out.println(count + " Relationships [" + (System.currentTimeMillis()-time1)/1000 + "sec]");
 					transaction.success();
 					transaction.finish();
@@ -165,7 +165,7 @@ public class CreateGraphDatabase {
 			transaction.failure();
 		}finally {
 			transaction.finish();
-			System.out.println("Finished adding relationships.");
+			System.out.println("Finished adding " + count + " relationships.");
 		}
 		registerShutdownHook( graphDB );
 		
