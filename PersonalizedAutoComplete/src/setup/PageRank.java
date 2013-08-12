@@ -27,10 +27,19 @@ public class PageRank {
 		 * PAGE RANK ITERATION:
 		 -----------------------------------------------------------------------------------------*/
 		
+		System.out.println(newPageRank.size() + " nodes to compute");
+		long start = System.currentTimeMillis();
+		
 		for(int i= 0; i < numberOfIterations; i++){
-			
+			System.out.println("calculating Page rank iteration numer: " + (i+1));
+			int cnt = 0;
 			for(Entry<Long, Double> entry : pageRank.entrySet()){
 				Node node = graphDB.getNodeById(entry.getKey());
+				cnt++;
+				if (cnt%50000==0){
+					long time = System.currentTimeMillis() - start;
+					System.out.println("computed: " + cnt + " nodes\t" + (time / 1000) + " s");	
+				}
 				//count number of outgoing links
 				int outgoingLinks = 0;
 				for (Relationship rel: node.getRelationships(Direction.OUTGOING)){
@@ -62,7 +71,8 @@ public class PageRank {
 	
 		int count = 0;
 		Transaction tx = graphDB.beginTx();
-		
+		System.out.println("make PR values persistent ");
+		int i = 1;
 		try {
 			for(Entry<Long, Double> entry : pageRank.entrySet()){
 				Node node = graphDB.getNodeById(entry.getKey());
@@ -71,6 +81,7 @@ public class PageRank {
 					tx.success();
 					tx.finish();
 					count = 0;
+					System.out.println((i * count) + " nodes are now persistent");
 					tx = graphDB.beginTx();
 				}
 			}

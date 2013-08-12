@@ -29,7 +29,7 @@ public class Config extends Properties{
 	
 	public Config(){
 		// 
-		String configFile = "/home/carina/Workspaces/Data/config.txt";
+		String configFile = "config.txt";
 		try {
 			BufferedInputStream stream = new BufferedInputStream(
 					new FileInputStream(configFile));
