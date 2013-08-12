@@ -1,5 +1,6 @@
 package search;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -43,6 +44,7 @@ public class Search {
 		s.setSort(new SortField("score", SortField.DOUBLE, true));
 		
 		Index<Node> index = graphDB.index().forNodes(Config.get().INDEX_NAME);
+		
 		
 		//TODO!
 		IndexHits<Node> hits = index.query(new QueryContext(startNodes).defaultOperator(Operator.AND).sort(s).top(2));		
