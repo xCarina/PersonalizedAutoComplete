@@ -12,6 +12,7 @@ public class Config extends Properties{
 	public String DB_PATH; 
 	public String WIKI_LINKS;
 	public String WIKI_TITLES;
+	public String WIKI_PR;
 	public String WIKI_USERS;
 	//for building the index
 	public String INDEX_NAME;

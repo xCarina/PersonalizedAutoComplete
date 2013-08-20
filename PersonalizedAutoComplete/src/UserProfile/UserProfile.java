@@ -4,44 +4,116 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+
+import org.neo4j.graphdb.Node;
+import org.neo4j.helpers.Pair;
+import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
+
+import setup.Config;
 
 public class UserProfile {
 
 	private static String userName;
-	private static String[] edits_learning;
-	private static String[] edits_testing;
+	private static ArrayList<Node> allEdits;
+	private static ArrayList<Node> learning;
+	private static ArrayList<Node> testing;
+	private static HashMap<Long, Double> mapEdits;
 	
 	public String getName(){
 		return userName;
 	}
-	public String[] getEdits_learning(){
-		return edits_learning;
+	public ArrayList<Node> getEdits_learning(){
+		return learning;
 	}
-	public String[] getEdits_testing(){
-		return edits_testing;
+	public ArrayList<Node> getEdits_testing(){
+		return testing;
 	}	
+	public HashMap<Long,Double> getNumberOfEdits(){
+		return mapEdits;
+	}
 	
-	public void createUserProfile(String line) {
+	public void createUserProfile(String line, EmbeddedReadOnlyGraphDatabase db) {
+		
+		long time0, time1;
+		time0 = System.currentTimeMillis();	
+		System.out.println("Starts creating userprofile...");
+		
+		allEdits = new ArrayList<Node>();
+		learning = new ArrayList<Node>();
+		testing = new ArrayList<Node>();
+		mapEdits = new HashMap<Long, Double>();
+
 		String[] values = line.split("\t");
 		userName = values[0];
-		int edits = values.length-1;
-		int numberOfTestData = 0;
-		int numberOfLearningData = 0;
+		int edits = values.length-1;	
+		System.out.println("number of edits for this user: " + edits);
+		int numberOfLearningData = 0;		
 		if(edits != 0){
+			//Store all edits as nodes in allEdits and their number of edits and nodeID in mapEdits
+			for(int i= 1; i<=edits; i++){
+				String title = getEditTitel(values[i]);
+				Double numberEdits = getNumberOfEdits(values[i]);
+				Node node = getNode(title,db);
+				if(node!=null){
+					allEdits.add(node);
+					mapEdits.put(node.getId(), numberEdits);
+					
+				}
+
+			}
 			// 20:80 split to use as test and learning data
-			numberOfTestData = 	(edits * 20) / 100;
+			numberOfLearningData = 	(edits * 20) / 100;
 		}
+		//for randomizing the chosen 20% of learning data, use this code snippet:
+		// Collections.shuffle(allEdits);
+		
+		
 		/* first 20% of all edits are being used as interests for the personalized search 
 		 * (edits are ordered by number of edits => first edits = most interested in 
 		 *  Store edits in userEdits for use while searching */
-		for(int i = 0; i< numberOfTestData; i++){
-			String id = getEditTitel(values[i+1]);
-			edits_learning[i] = id;
+		for(int i = 0; i< numberOfLearningData; i++){
+			 learning.add(allEdits.get(i));
+			}	
+		for(int i = numberOfLearningData; i< edits; i++){
+			testing.add(allEdits.get(i));
 		}
-		for(int i = numberOfTestData; i< edits; i++){
-			String id = getEditTitel(values[i+1]);
-			edits_testing[i-numberOfTestData] = id;
+		time1 = System.currentTimeMillis();
+		System.out.println("Userprofile complete! (after "+ (time1-time0)/1000 + "sec)");
+	}
+	
+	
+	private Node getNode(String title, EmbeddedReadOnlyGraphDatabase db) {
+		
+		Node n = null;
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(Config.get().WIKI_TITLES));
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
 		}
+		String line = "";
+		boolean found = false;
+		try {
+			while(!found && (line=reader.readLine())!=null){
+				String[] values = line.split("\t");
+				if(values.length>=2){
+					long id = Integer.parseInt(values[0]);
+					String t = values[1];
+					if(t.equals(title)){
+						found = true;
+						n = db.getNodeById(id);
+							}
+				}
+				}
+
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return n;
 	}
 	
 	/*
@@ -53,14 +125,11 @@ public class UserProfile {
 		return data[0].substring(1);
 	}
 	
-
-
-
-
-
-
-
-
+	public Double getNumberOfEdits(String string){
+		String[] data = string.split(",");
+		String number = data[1].substring(0, data[1].length()-1);
+		return (double) Integer.parseInt(number);
+	}
 
 
 }

@@ -152,7 +152,7 @@ public class CreateGraphDatabase {
 					node1.createRelationshipTo(node2, RelTypes.LINKS_TO);
 				}
 				 
-				 if((count++%500000)==499999) {
+				 if((count++%100000)==99999) {
 					System.out.println(count + " Relationships [" + (System.currentTimeMillis()-time1)/1000 + "sec]");
 					transaction.success();
 					transaction.finish();
