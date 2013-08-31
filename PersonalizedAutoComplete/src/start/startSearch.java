@@ -23,11 +23,12 @@ public class startSearch {
 	
 	public static void execute(){
 		
-		EmbeddedReadOnlyGraphDatabase graphDB = new EmbeddedReadOnlyGraphDatabase(Config.get().DB_PATH);
+		EmbeddedReadOnlyGraphDatabase db = new EmbeddedReadOnlyGraphDatabase(Config.get().DB_PATH);
 		
 		UserProfile profile = new UserProfile();
 		
-		String[] queries = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "V", "W", "Z"};
+		
+		String[] queries = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 		
 		BufferedReader reader = null;
 		try {
@@ -38,7 +39,7 @@ public class startSearch {
 		String line = "";
 		
 		// countUsers: to define how many users are going to be used for a search process
-		int countUsers = 0;
+		int countUsers = 1;
 		//defines how many users are used for search
 		int users = Config.get().USER_CNT;
 
@@ -49,40 +50,75 @@ public class startSearch {
 			 */
 			try {
 				while(((line=reader.readLine())!=null)){
-					profile.createUserProfile(line, graphDB);
+					System.out.println("######### Starts calculation for user number " + countUsers + " ##########");
+					profile.createUserProfile(line, db);
 					String name = profile.getName();
 					ArrayList<Node> learning = profile.getEdits_learning();
+					System.out.println("\t Learning data size: " + learning.size());
 					ArrayList<Node> testing = profile.getEdits_testing();
+					System.out.println("\t Testing data size: " + testing.size());
 					HashMap<Long ,Double> results = new HashMap<>();
 					
-					// loop over all queries:
 					if(learning!=null){
+						
+						BFS_all bfs = new BFS_all();
+						ArrayList<Long> bfsResults = new ArrayList<Long>();
+						Search search = null;
+						Evaluation eval = new Evaluation();
+						Long time = System.currentTimeMillis();
+						System.out.println("\n \t calculating BFS");
+						bfs.getResults(learning);
+						bfsResults = bfs.endNodes;
+						System.out.println("\t Done with BFS after "+ (System.currentTimeMillis()-time)/1000 +"sec [" + bfsResults.size() + " nodes visited] \n");
 						for(String query : queries){
-							//simple search without BFS:
-							SimpleSearch ssearch = new SimpleSearch();
-							results = ssearch.getResults(query, learning, graphDB);
-							//all BFS algorithms:
-							BFS_all search = new BFS_all();
-							search.getResults(query, learning, graphDB);
+							
+							System.out.println("\n \t #### QUERY: " + query + " ####");
+							
+							//get relevant articles:
 							Search_TestData tsearch = new Search_TestData();
-							HashMap<Long ,Double> relevant = tsearch.getResults(query, testing, graphDB);
-							Evaluation eval = new Evaluation();
-							eval.calculate(results, relevant, query, 0, name);
-							eval.calculate(search.results_noPR, relevant, query, 1, name);
-							eval.calculate(search.results_PR, relevant, query, 2, name);
-							eval.calculate(search.results_adaptPR, relevant, query, 3, name);
-							eval.calculate(search.results_newPR, relevant, query, 4, name);						
+							HashMap<Long ,Double> relevant = tsearch.getResults(query, testing, db);
+							
+							//all BFS algorithms:
+							search = new BFS_noPR();
+							results = new HashMap<Long,Double>();
+							results = search.getResults(query, bfsResults, db);
+							System.out.println("\n \t [1] Number of results: " + results.size());
+							eval.calculate(results, relevant, query, 1, name);
+							System.out.println("\t Done with BFS 1");
+							
+							search = new BFS_PR();
+							results = new HashMap<Long,Double>();
+							results = search.getResults(query, bfsResults, db);
+							System.out.println("\n \t [2] Number of results: " + results.size());
+							eval.calculate(results, relevant, query, 2, name);
+							System.out.println(" \tDone with BFS 2");
+							
+							search = new BFS_adaptPR();
+							results = new HashMap<Long,Double>();
+							results = search.getResults(query, bfsResults, db);
+							System.out.println("\n \t [3] Number of results: " + results.size());
+							eval.calculate(results, relevant, query, 3, name);
+							System.out.println("\t Done with BFS 3");
+							
+							search = new BFS_newPR();
+							results = new HashMap<Long,Double>();
+							results = search.getResults(query, bfsResults, db);
+							System.out.println("\n \t [4] Number of results: " + results.size());
+							eval.calculate(results, relevant, query, 4, name);
+							System.out.println("\t Done with BFS 4");
+												
 					}
 						
-					}//if(countUsers++ > users) break;
+					}System.out.println("\n >>>>> Done with calculation for user number " + countUsers++ + "\n");
 				}
 
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (Exception e){
+				e.printStackTrace();
 				System.out.println("Failed!");
 			}
-			graphDB.shutdown();
+			db.shutdown();
 			
 	}
 	

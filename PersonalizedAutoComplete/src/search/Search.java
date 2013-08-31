@@ -7,7 +7,7 @@ import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
 
 public interface Search {
 	
-	HashMap<Long ,Double> getResults(String query, ArrayList<Node> startNodes, EmbeddedReadOnlyGraphDatabase db);
+	HashMap<Long ,Double> getResults(String query, ArrayList<Long> bfsResults, EmbeddedReadOnlyGraphDatabase db);
 	
 
 }

@@ -12,29 +12,20 @@ public class BFS_noPR implements Search{
 
 	@Override
 	public HashMap<Long, Double> getResults(String query,
-			ArrayList<Node> startNodes, EmbeddedReadOnlyGraphDatabase db) {
+			ArrayList<Long> bfsResults, EmbeddedReadOnlyGraphDatabase db) {
 		
 		HashMap<Long, Double> results = new HashMap<>();
-		for(Node node : startNodes){
-			for(Relationship rs : node.getRelationships(Direction.OUTGOING)){
-				Node rsNode = rs.getEndNode();
-				if(rsNode.hasProperty("title")){
-					String title = (String) rsNode.getProperty("title");
-					if(title.startsWith(query)){
-						results.put(rsNode.getId(), 0.0);
-					}
-				} 
-				for(Relationship rs2 : rsNode.getRelationships(Direction.OUTGOING)){
-					Node rsNode2 = rs2.getEndNode();
-					if(rsNode2.hasProperty("title")){
-						String title = (String) rsNode2.getProperty("title");
-						if(title.startsWith(query)){
-							results.put(rsNode2.getId(), 0.0);
-						}
-					}
+		
+		for(Long id : bfsResults){
+			Node node = db.getNodeById(id);
+			if(node.hasProperty("title")){
+				String title = (String) node.getProperty("title");
+				if(title.startsWith(query)){
+					results.put(id, 1.0);
 				}
 			}
 		}
+		
 		return results;
 		
 	}

@@ -1,5 +1,9 @@
 package setup;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -94,10 +98,54 @@ public class PageRank {
 		graphDB.shutdown();
 		
 	}
+	
+	private static void addPageRankValues(){
+		
+	
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(Config.get().WIKI_PR));
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		String line = "";
+		Node node = null;
+		Transaction transaction = graphDB.beginTx();
+		int count = 0;
+		try {
+			long time1 = System.currentTimeMillis();
+			System.out.println("Starts adding pr values...");
+			while((line=reader.readLine())!=null){
+				String[] values = line.split("\t");
+				if(values.length >= 2){
+					long id = Integer.parseInt(values[0]);
+					Double pr = Double.parseDouble(values[1]);
+					node = graphDB.getNodeById(id);
+					node.setProperty("pageRankValue", pr);
+				}
+				if((count++%100000)==99999) {
+					System.out.println(count + " PR Values added [" + (System.currentTimeMillis()-time1)/1000 + "sec]");
+					transaction.success();
+					transaction.finish();
+					transaction = graphDB.beginTx();
+				 }
+				
+			}transaction.success();
+		}catch (IOException e) {
+			e.printStackTrace();
+			transaction.failure();
+		}finally {
+			transaction.finish();
+		}
+		graphDB.shutdown();
+		
+	}
+	
+
 
 	public static void main(String[] args) {
 		
-		calculatePageRank();
+		addPageRankValues();
 
 	}
 

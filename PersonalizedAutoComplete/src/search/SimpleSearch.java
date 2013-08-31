@@ -16,7 +16,7 @@ public class SimpleSearch implements Search{
 
 
 	public HashMap<Long, Double> getResults(String query,
-			ArrayList<Node> startNodes,
+			ArrayList<Long> bfsResults,
 			EmbeddedReadOnlyGraphDatabase db) {
 		
 		HashMap<Long, Double> results = new HashMap<>();

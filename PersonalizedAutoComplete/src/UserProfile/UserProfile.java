@@ -49,17 +49,15 @@ public class UserProfile {
 		String[] values = line.split("\t");
 		userName = values[0];
 		int edits = values.length-1;	
-		System.out.println("number of edits for this user: " + edits);
+		System.out.println("\t Number of edits for this user: " + edits);
 		int numberOfLearningData = 0;		
 		if(edits != 0){
-			//Store all edits as nodes in allEdits and their number of edits and nodeID in mapEdits
+			//Store all edits as nodes in allEdits
 			for(int i= 1; i<=edits; i++){
 				String title = getEditTitel(values[i]);
-				Double numberEdits = getNumberOfEdits(values[i]);
 				Node node = getNode(title,db);
 				if(node!=null){
 					allEdits.add(node);
-					mapEdits.put(node.getId(), numberEdits);
 					
 				}
 
@@ -67,8 +65,9 @@ public class UserProfile {
 			// 20:80 split to use as test and learning data
 			numberOfLearningData = 	(edits * 20) / 100;
 		}
-		//for randomizing the chosen 20% of learning data, use this code snippet:
-		// Collections.shuffle(allEdits);
+		if(Config.get().RANDOM_SPLIT){
+			Collections.shuffle(allEdits);
+		}
 		
 		
 		/* first 20% of all edits are being used as interests for the personalized search 
@@ -81,7 +80,7 @@ public class UserProfile {
 			testing.add(allEdits.get(i));
 		}
 		time1 = System.currentTimeMillis();
-		System.out.println("Userprofile complete! (after "+ (time1-time0)/1000 + "sec)");
+		System.out.println("\t Userprofile complete! (after "+ (time1-time0)/1000 + "sec)");
 	}
 	
 	
@@ -125,11 +124,7 @@ public class UserProfile {
 		return data[0].substring(1);
 	}
 	
-	public Double getNumberOfEdits(String string){
-		String[] data = string.split(",");
-		String number = data[1].substring(0, data[1].length()-1);
-		return (double) Integer.parseInt(number);
-	}
+
 
 
 }

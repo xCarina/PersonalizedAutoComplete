@@ -12,34 +12,25 @@ public class BFS_PR implements Search{
 
 	@Override
 	public HashMap<Long, Double> getResults(String query,
-			ArrayList<Node> startNodes,
+			ArrayList<Long> bfsResults,
 			EmbeddedReadOnlyGraphDatabase db) {
 		
 		
 		HashMap<Long, Double> results = new HashMap<>();
 		
-		for(Node node : startNodes){
-			for(Relationship rs : node.getRelationships(Direction.OUTGOING)){
-				Node rsNode = rs.getEndNode();
-				if(rsNode.hasProperty("title")){
-					String title = (String) rsNode.getProperty("title");
-					if(title.startsWith(query)){
-						Double pr = (Double) rsNode.getProperty("pageRankValue");
-						results.put(rsNode.getId(), pr);
-					}
-				}
-				for(Relationship rs2 : rsNode.getRelationships(Direction.OUTGOING)){
-					Node rsNode2 = rs2.getEndNode();
-					if(rsNode2.hasProperty("title")){
-						String title = (String) rsNode2.getProperty("title");
-						if(title.startsWith(query)){
-							Double pr = (Double) rsNode2.getProperty("pageRankValue");
-							results.put(rsNode2.getId(), pr);
-						}
+		for(Long id : bfsResults){
+			Node node = db.getNodeById(id);
+			if(node.hasProperty("title")){
+				String title = (String) node.getProperty("title");
+				if(title.startsWith(query)){
+					if(node.hasProperty("pageRankValue")){
+						Double pr = (Double) node.getProperty("pageRankValue");
+						results.put(id, pr);
 					}
 				}
 			}
 		}
+		
 		return results;
 	}
 
