@@ -81,8 +81,7 @@ public class startSearch {
 							e.printStackTrace();
 						}
 						System.out.println("\t calculated new pagerank on subgraph after "+ (System.currentTimeMillis()-time)/1000 +"sec \n");
-					//	for(String query : queries){
-						String query = "A";
+						for(String query : queries){
 							
 							System.out.println("\n #### QUERY: " + query + " ####");
 							
@@ -117,10 +116,9 @@ public class startSearch {
 							eval.calculate(results, relevant, query, 4, name);
 							System.out.println("\t Done with BFS 4");
 												
-					//}
+					}
 						
 					}System.out.println("\n >>>>> Done with calculation for user number " + countUsers++ + "\n");
-					if(++countUsers >= 2)break;
 				}
 
 			} catch (IOException e) {

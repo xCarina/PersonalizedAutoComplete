@@ -35,12 +35,10 @@ public class BFS_all{
 				Node rsNode = rs.getEndNode();
 				Long id = rsNode.getId();
 				endNodes.add(id);
-				if(cnt++ > 3)break;
 				for(Relationship rs2 : rsNode.getRelationships(Direction.OUTGOING)){
 					Node rsNode2 = rs2.getEndNode();
 					Long id2 = rsNode2.getId();
 					endNodes.add(id2);
-					if(cnt2++ > 4)break;
 				}
 			}
 		}
