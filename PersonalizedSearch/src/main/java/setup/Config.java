@@ -32,7 +32,7 @@ public class Config extends Properties{
 	
 	public Config(){
 		// 
-		String configFile = "/home/carina/Workspaces/Data/config.txt";
+		String configFile = "config.txt";
 		try {
 			BufferedInputStream stream = new BufferedInputStream(
 					new FileInputStream(configFile));
@@ -62,6 +62,8 @@ public class Config extends Properties{
 				f.set(this, this.getProperty(f.getName()));
 			}else if (f.getType().equals(int.class)) {
 				f.setInt(this, Integer.valueOf(this.getProperty(f.getName())));
+			}else if (f.getType().equals(boolean.class)) {
+				f.setBoolean(this,Boolean.valueOf(this.getProperty(f.getName())));
 			}
 			
 		}
