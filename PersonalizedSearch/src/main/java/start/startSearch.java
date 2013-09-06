@@ -72,15 +72,15 @@ public class startSearch {
 						bfs.getResults(learning);
 						bfsResults = bfs.endNodes;
 						System.out.println("Done with BFS after "+ (System.currentTimeMillis()-time)/1000 +"sec [" + bfsResults.size() + " nodes visited] \n");
-						CalcPR pr = new CalcPR();
-						time = System.currentTimeMillis();
-						System.out.println("calculating new PR...");
-						try {
-							newPR = pr.recalcPR(bfsResults, db);
-						} catch (NumberFormatException | IOException e) {
-							e.printStackTrace();
-						}
-						System.out.println("\t calculated new pagerank on subgraph after "+ (System.currentTimeMillis()-time)/1000 +"sec \n");
+//						CalcPR pr = new CalcPR();
+//						time = System.currentTimeMillis();
+//						System.out.println("calculating new PR...");
+//						try {
+//							newPR = pr.recalcPR(bfsResults, db);
+//						} catch (NumberFormatException | IOException e) {
+//							e.printStackTrace();
+//						}
+//						System.out.println("\t calculated new pagerank on subgraph after "+ (System.currentTimeMillis()-time)/1000 +"sec \n");
 						for(String query : queries){
 							
 							System.out.println("\n #### QUERY: " + query + " ####");
@@ -110,15 +110,16 @@ public class startSearch {
 							eval.calculate(results, relevant, query, 3, name);
 							System.out.println("\t Done with BFS 3");
 							
-							BFS_newPR search2 = new BFS_newPR();
-							results = new HashMap<Long,Double>();
-							results = search2.getResults(query, newPR, db);
-							eval.calculate(results, relevant, query, 4, name);
-							System.out.println("\t Done with BFS 4");
+//							BFS_newPR search2 = new BFS_newPR();
+//							results = new HashMap<Long,Double>();
+//							results = search2.getResults(query, newPR, db);
+//							eval.calculate(results, relevant, query, 4, name);
+//							System.out.println("\t Done with BFS 4");
 												
 					}
 						
 					}System.out.println("\n >>>>> Done with calculation for user number " + countUsers++ + "\n");
+					if(countUsers > users) break;
 				}
 
 			} catch (IOException e) {
