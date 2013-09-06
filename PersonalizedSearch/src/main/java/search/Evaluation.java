@@ -54,7 +54,7 @@ public class Evaluation {
 		
 		ArrayList<Long> topResults = getTopKResults(results, k);
 		
-		int cnt = 1;
+		double cnt = 1;
 		
 		for(Long id : topResults){
 			if(relevantArticles.containsKey(id)){
