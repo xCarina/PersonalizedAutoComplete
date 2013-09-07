@@ -23,6 +23,7 @@ public class Config extends Properties{
 	public String EVAL_DIR;
 	// number of users used for search | search query | id for algorithm being used
 	public int USER_CNT;
+	public int START_USER;
 	public String QUERY;
 	public int ALGO_ID;
 	
@@ -40,7 +41,7 @@ public class Config extends Properties{
 			stream.close();
 			
 		} catch (IOException e) {
-			System.out.println("file not found");
+			System.out.println("file " + configFile + " not found");
 		}
 		try {
 			this.initialize();

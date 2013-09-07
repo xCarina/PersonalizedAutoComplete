@@ -40,9 +40,11 @@ public class startSearch {
 		String line = "";
 		
 		// countUsers: to define how many users are going to be used for a search process
-		int countUsers = 1;
+		int countUsers = 0;
 		//defines how many users are used for search
 		int users = Config.get().USER_CNT;
+		int start_user = Config.get().START_USER;
+		int endUser = start_user + users;
 
 
 			/* for each line of the file: one user
@@ -51,13 +53,14 @@ public class startSearch {
 			 */
 			try {
 				while(((line=reader.readLine())!=null)){
+					countUsers++;
+					if(countUsers < start_user) continue;
+					
 					System.out.println("######### Starts calculation for user number " + countUsers + " ##########");
 					profile.createUserProfile(line, db);
 					String name = profile.getName();
 					ArrayList<Node> learning = profile.getEdits_learning();
-					System.out.println("\t Learning data size: " + learning.size());
 					ArrayList<Node> testing = profile.getEdits_testing();
-					System.out.println("\t Testing data size: " + testing.size());
 					HashMap<Long ,Double> results = new HashMap<>();
 					HashMap<Long ,Double> newPR = new HashMap<>();
 					
@@ -83,32 +86,27 @@ public class startSearch {
 //						System.out.println("\t calculated new pagerank on subgraph after "+ (System.currentTimeMillis()-time)/1000 +"sec \n");
 						for(String query : queries){
 							
-							System.out.println("\n #### QUERY: " + query + " ####");
+							System.out.println("\n >>>> QUERY: " + query + " <<<<");
 							
 							//get relevant articles:
 							Search_TestData tsearch = new Search_TestData();
 							HashMap<Long ,Double> relevant = tsearch.getResults(query, testing, db);
-							
-							System.out.println("\t Number of relevant items: " + relevant.size());
 							
 							//all BFS algorithms:
 							search = new BFS_noPR();
 							results = new HashMap<Long,Double>();
 							results = search.getResults(query, bfsResults, db);
 							eval.calculate(results, relevant, query, 1, name);
-							System.out.println("\t Done with BFS 1");
 							
 							search = new BFS_PR();
 							results = new HashMap<Long,Double>();
 							results = search.getResults(query, bfsResults, db);
 							eval.calculate(results, relevant, query, 2, name);
-							System.out.println(" \tDone with BFS 2");
 							
 							search = new BFS_adaptPR();
 							results = new HashMap<Long,Double>();
 							results = search.getResults(query, bfsResults, db);
 							eval.calculate(results, relevant, query, 3, name);
-							System.out.println("\t Done with BFS 3");
 							
 //							BFS_newPR search2 = new BFS_newPR();
 //							results = new HashMap<Long,Double>();
@@ -118,8 +116,8 @@ public class startSearch {
 												
 					}
 						
-					}System.out.println("\n >>>>> Done with calculation for user number " + countUsers++ + "\n");
-					if(countUsers > users) break;
+					}System.out.println("\n >>>>> Done with calculation for user number " + countUsers + "\n");
+					if(countUsers >= endUser) break;
 				}
 
 			} catch (IOException e) {
